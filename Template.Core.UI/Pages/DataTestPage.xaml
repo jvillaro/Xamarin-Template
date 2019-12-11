@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<views:MvxContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Template.Core.UI.Pages.DataTestPage"
+    xmlns:views="clr-namespace:MvvmCross.Forms.Views;assembly=MvvmCross.Forms"
+    xmlns:viewModels="clr-namespace:Template.Core.ViewModels;assembly=Template.Core"
+    x:TypeArguments="viewModels:DataTestViewModel">
+
+    <StackLayout Orientation="Vertical" VerticalOptions="FillAndExpand" >
+
+        <CollectionView ItemsSource="{Binding Tests}" BackgroundColor="LightGray"
+                        SelectedItem="{Binding SelectedTest, Mode=TwoWay}"
+                        SelectionMode="Single"
+                        VerticalOptions="FillAndExpand"
+                        HorizontalOptions="FillAndExpand"
+                        Margin="10, 10, 10, 0">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    
+                    <Label 
+                        TextColor="Black" 
+                        Text="{Binding Text}"
+                        FontAttributes="Italic" 
+                        VerticalOptions="End" />                    
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button 
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="EndAndExpand"
+            Padding="0"
+            Margin="5, 0, 5, 0"
+            Text="Add Test" 
+            Command="{Binding AddTestCommand}"/>
+
+        <Button 
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="EndAndExpand"
+            Padding="0"
+            Margin="5, 0, 5, 5"
+            Text="Remove Test" 
+            Command="{Binding RemoveTestCommand}"/>
+
+    </StackLayout>
+
+</views:MvxContentPage>
