@@ -2,5 +2,12 @@
   "AppTitle": "Xamarin Template",
   "Home": "Inicio",
   "DataTests": "Pruebas de datos",
-  "Logout": "Cerrar sesi髇"
+  "Login": "Iniciar sesi贸n",
+  "Logout": "Cerrar sesi贸n",
+  "AddTest": "Agregar",
+  "RemoveTest": "Eliminar",
+  "Confirmation": "Confirmaci贸n",
+  "CloseSessionQuestion": "驴Desea cerrar sesi贸n?",
+  "Yes": "S铆",
+  "No": "No"
 }

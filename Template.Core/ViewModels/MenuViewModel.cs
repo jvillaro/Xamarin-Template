@@ -61,6 +61,18 @@ namespace Template.Core.ViewModels
         #endregion
 
 
+        #region --- Constructor ---
+
+        /// <summary>
+        /// Gets by DI the required services
+        /// </summary>
+        public MenuViewModel(IMvxLogProvider logProvider, IMvxNavigationService navigationService) : base(logProvider, navigationService)
+        {
+        }
+
+        #endregion
+
+
         #region --- Prepare ---
 
         /// <summary>
@@ -73,19 +85,7 @@ namespace Template.Core.ViewModels
         }
 
         #endregion
-
-
-        #region --- Constructor ---
-
-        /// <summary>
-        /// Gets by DI the required services
-        /// </summary>
-        public MenuViewModel(IMvxLogProvider logProvider, IMvxNavigationService navigationService) : base(logProvider, navigationService)
-        {
-        }
-
-        #endregion
-
+        
 
         #region --- Initialize ---
 
@@ -101,8 +101,7 @@ namespace Template.Core.ViewModels
                 {
                     new MenuItem
                     {
-                        Name = "Home",
-                        //Name = GetText("Home"),
+                        Name = GetText("Home"),
                         Description = string.Empty,
                         Icon = "",
                         Command = new MvxCommand(async () =>
@@ -115,7 +114,7 @@ namespace Template.Core.ViewModels
                     },
                     new MenuItem
                     {
-                        Name = "DataTests",
+                        Name = GetText("DataTests"),
                         Description = string.Empty,
                         Icon = "",
                         Command = new MvxCommand(async () =>
@@ -128,14 +127,14 @@ namespace Template.Core.ViewModels
                     },
                     new MenuItem
                     {
-                        Name = "Logout",
+                        Name = GetText("Logout"),
                         Description = string.Empty,
                         Icon = "",
                         Command = new MvxCommand(async () =>
                         {
                             if (!IsBusy)
                             {
-                                await NotificationService.ConfirmAsync("Confirmación", "¿Desea cerrar sesión?", "Si", "No",async result =>
+                                await NotificationService.ConfirmAsync("Confirmation", "CloseSessionQuestion", "Yes", "No", async result =>
                                 {
                                     if (result)
                                     {
