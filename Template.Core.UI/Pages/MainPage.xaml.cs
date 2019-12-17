@@ -10,10 +10,10 @@ using Xamarin.Forms.Xaml;
 namespace Template.Core.UI.Pages
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    [MvxMasterDetailPagePresentation(Position = MasterDetailPosition.Root, WrapInNavigationPage = false, Title = "MasterDetail Page")]
-    public partial class MasterDetailPage : MvxMasterDetailPage<MasterDetailViewModel>
+    [MvxMasterDetailPagePresentation(MasterDetailPosition.Root, WrapInNavigationPage = false)]
+    public partial class MainPage
     {
-        public MasterDetailPage()
+        public MainPage()
         {
             InitializeComponent();
         }

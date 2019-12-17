@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿#region --- using ---
+
 using Template.Core.Interfaces;
 
-namespace Template.Core.Services
+#endregion
+
+namespace Template.Droid.Services
 {
     /// <summary>
-    /// Platform service
+    /// Android implementation of the Platform Service
     /// </summary>
     public class PlatformService : IPlatformService
     {

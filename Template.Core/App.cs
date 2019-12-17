@@ -2,12 +2,11 @@
 
 using MvvmCross;
 using MvvmCross.IoC;
-using MvvmCross.Localization;
+using MvvmCross.Plugin.JsonLocalization;
 using MvvmCross.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
 using System.Threading.Tasks;
+using Template.Core.Services;
 using Template.Core.ViewModels;
 
 #endregion
@@ -27,9 +26,11 @@ namespace Template.Core
                 .AsInterfaces()
                 .RegisterAsLazySingleton();
 
-            //Mvx.IoCProvider.RegisterSingleton<IMvxTextProvider>(new TextProviderBuilder().TextProvider);
+            var currentCulture = CultureInfo.CreateSpecificCulture("es-UY");
+            CultureInfo.DefaultThreadCurrentCulture = currentCulture;
 
-            RegisterAppStart<MasterDetailViewModel>();
+            RegisterAppStart<MainViewModel>();
+            InitializeTextProvider();
         }
 
         /// <summary>
@@ -48,6 +49,17 @@ namespace Template.Core
         public override void Reset()
         {
             base.Reset();
+        }
+
+
+        /// <summary>
+        /// Initializes the localization provider
+        /// </summary>
+        private void InitializeTextProvider()
+        {
+            var builder = new TextProviderBuilder();
+            Mvx.IoCProvider.RegisterSingleton<IMvxTextProviderBuilder>(builder);
+            Mvx.IoCProvider.RegisterSingleton(builder.TextProvider);
         }
     }
 }

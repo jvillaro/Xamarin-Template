@@ -1,10 +1,16 @@
 ﻿#region --- using ---
 
+using MobileTemplate.Core.Messages;
 using MvvmCross.Commands;
+using MvvmCross.Logging;
+using MvvmCross.Navigation;
+using MvvmCross.Plugin.Messenger;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Template.Core.Enums;
+using Template.Core.Messages;
 using Template.Core.Models;
+using Template.Models;
 
 #endregion
 
@@ -17,8 +23,8 @@ namespace Template.Core.ViewModels
     {
         #region --- Variables ---
 
-        private ObservableCollection<MenuItem> menuItems;
         private MenuItem selectedMenuItem;
+        private MvxSubscriptionToken userUpdatedSubscriptionToken;
 
         #endregion
 
@@ -26,13 +32,14 @@ namespace Template.Core.ViewModels
         #region --- Properties ---
 
         /// <summary>
+        /// User
+        /// </summary>
+        public User User { get; set; }
+
+        /// <summary>
         /// Collection of menu items
         /// </summary>
-        public ObservableCollection<MenuItem> MenuItems
-        {
-            get => menuItems;
-            set => SetProperty(ref menuItems, value);
-        }
+        public ObservableCollection<MenuItem> MenuItems { get; set; }
 
         
         /// <summary>
@@ -43,13 +50,42 @@ namespace Template.Core.ViewModels
             get => selectedMenuItem;
             set 
             {
-                SetProperty(ref selectedMenuItem, value);
-                Task.Run(async () => await MenuItemActionAsync());
+                this.selectedMenuItem = value;
+                if (value?.Command == null) return;
+                this.selectedMenuItem = null;
+                RaisePropertyChanged(() => SelectedMenuItem);
+                value.Command.Execute(null);
             }
         }
 
         #endregion
-                
+
+
+        #region --- Prepare ---
+
+        /// <summary>
+        /// Prepares the local variables
+        /// </summary>
+        public override void Prepare()
+        {
+            SubscribeToUserUpdatedMessage();
+            this.MenuItems = new ObservableCollection<MenuItem>();
+        }
+
+        #endregion
+
+
+        #region --- Constructor ---
+
+        /// <summary>
+        /// Gets by DI the required services
+        /// </summary>
+        public MenuViewModel(IMvxLogProvider logProvider, IMvxNavigationService navigationService) : base(logProvider, navigationService)
+        {
+        }
+
+        #endregion
+
 
         #region --- Initialize ---
 
@@ -65,24 +101,49 @@ namespace Template.Core.ViewModels
                 {
                     new MenuItem
                     {
-                        Key = MenuItemKey.Home,
                         Name = "Home",
-                        Description = "Go to home",
-                        Icon = ""
+                        //Name = GetText("Home"),
+                        Description = string.Empty,
+                        Icon = "",
+                        Command = new MvxCommand(async () =>
+                        {
+                            if (!IsBusy)
+                            {
+                                await NavigationService.Navigate<HomeViewModel>();
+                            }
+                        })
                     },
                     new MenuItem
                     {
-                        Key = MenuItemKey.DataTests,
-                        Name = "Data Tests",
-                        Description = "Test data",
-                        Icon = ""
+                        Name = "DataTests",
+                        Description = string.Empty,
+                        Icon = "",
+                        Command = new MvxCommand(async () =>
+                        {
+                            if (!IsBusy)
+                            {
+                                await NavigationService.Navigate<DataTestViewModel>();
+                            }
+                        })
                     },
                     new MenuItem
                     {
-                        Key = MenuItemKey.Logout,
-                        Name = "Log out",
-                        Description = "Log out of the app",
-                        Icon = ""
+                        Name = "Logout",
+                        Description = string.Empty,
+                        Icon = "",
+                        Command = new MvxCommand(async () =>
+                        {
+                            if (!IsBusy)
+                            {
+                                await NotificationService.ConfirmAsync("Confirmación", "¿Desea cerrar sesión?", "Si", "No",async result =>
+                                {
+                                    if (result)
+                                    {
+                                        await NavigationService.Navigate<LoginViewModel>();
+                                    }
+                                });
+                            }
+                        })
                     }
                 };
             });
@@ -91,45 +152,33 @@ namespace Template.Core.ViewModels
         #endregion
 
 
-        #region --- MenuItemActionAsync ---
+        #region --- SubscribeToUserUpdatedMessage ---
 
         /// <summary>
-        /// Actions to execute when a menu item is selected
+        /// Subscribes the viewmodel to handle theme updated messages 
         /// </summary>
-        /// <returns></returns>
-        private async Task MenuItemActionAsync()
+        public void SubscribeToUserUpdatedMessage()
         {
-            switch (SelectedMenuItem.Key)
+            this.userUpdatedSubscriptionToken = this.MessengerService.Subscribe<UserUpdatedMessage>(message =>
             {
-                case MenuItemKey.Home:
-                    await NavigationService.Navigate<HomeViewModel>();
-                    break;
-                case MenuItemKey.DataTests:
-                    await NavigationService.Navigate<DataTestViewModel>();
-                    break;
-                case MenuItemKey.Logout:
-                    await NavigationService.Navigate<LoginViewModel>();
-                    //await ShowConfirmationAsync("Confirmación", "¿Desea cerrar sesión?", async result =>
-                    //{
-                    //    if (result)
-                    //    {
-                    //        await LogOutUser();
-                    //    }
-                    //});
-                    break;
-                default:
-                    break;
-            }
+                this.User = message.User;
+                RaisePropertyChanged(() => this.User);
+            });
+        }
 
-            if (Xamarin.Forms.Application.Current.MainPage is Xamarin.Forms.MasterDetailPage masterDetailPage)
-            {
-                masterDetailPage.IsPresented = false;
-            }
-            else if (Xamarin.Forms.Application.Current.MainPage is Xamarin.Forms.NavigationPage navigationPage
-                     && navigationPage.CurrentPage is Xamarin.Forms.MasterDetailPage nestedMasterDetail)
-            {
-                nestedMasterDetail.IsPresented = false;
-            }
+        #endregion
+
+
+        #region --- Release ---
+
+        /// <summary>
+        /// Release the inner objects
+        /// </summary>
+        public void Release()
+        {
+            if (userUpdatedSubscriptionToken == null) return;
+            this.MessengerService.Unsubscribe<UserAuthenticatedMessage>(userUpdatedSubscriptionToken);
+            this.userUpdatedSubscriptionToken = null;
         }
 
         #endregion

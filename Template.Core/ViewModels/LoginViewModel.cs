@@ -1,6 +1,7 @@
 ﻿#region --- usings ---
 
-
+using MvvmCross.Logging;
+using MvvmCross.Navigation;
 
 #endregion
 
@@ -16,7 +17,7 @@ namespace Template.Core.ViewModels
         /// <summary>
         /// Constructor
         /// </summary>
-        public LoginViewModel()
+        public LoginViewModel(IMvxLogProvider logProvider, IMvxNavigationService navigationService) : base(logProvider, navigationService)
         {
         }
 

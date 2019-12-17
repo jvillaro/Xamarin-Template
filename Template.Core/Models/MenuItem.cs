@@ -1,5 +1,6 @@
 ﻿#region --- Usings ---
 
+using System.Windows.Input;
 using Template.Core.Enums;
 
 #endregion
@@ -11,11 +12,6 @@ namespace Template.Core.Models
     /// </summary>
     public class MenuItem
     {
-        /// <summary>
-        /// Menu item key
-        /// </summary>
-        public MenuItemKey Key { get; set; }
-
         /// <summary>
         /// Item name
         /// </summary>
@@ -30,5 +26,11 @@ namespace Template.Core.Models
         /// Item icon
         /// </summary>
         public string Icon { get; set; }
+
+
+        /// <summary>
+        /// Item Command
+        /// </summary>
+        public ICommand Command { get; set; }
     }
 }

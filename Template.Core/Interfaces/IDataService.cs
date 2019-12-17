@@ -1,7 +1,6 @@
 ﻿#region --- using ---
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Template.Core.Entities;
 
 #endregion
@@ -13,33 +12,32 @@ namespace Template.Core.Interfaces
     /// </summary>
     public interface IDataService
     {
-        Task<int> InsertAsync(object item);
+        int Insert(object item);
 
 
-        Task<int> InsertOrReplace(object item);
+        int InsertOrReplace(object item);
 
 
-        Task<int> InsertAllAsync(IEnumerable<object> items, bool runIntransaction = true);
+        int InsertAll(IEnumerable<object> items, bool runIntransaction = true);
 
 
-        Task<int> UpdateAsync(object item);
+        int Update(object item);
 
 
-        Task<int> UpdateAllAsync(IEnumerable<object> items, bool runIntransaction = true);
-        
-
-        Task<int> DeleteAsync<T>(object item);
+        int UpdateAll(IEnumerable<object> items, bool runIntransaction = true);
 
 
-        Task<int> DeleteAllAsync<T>();
+        int Delete<T>(object item);
 
+
+        int DeleteAll<T>();
 
         /// <summary>
         /// Add a test to the database
         /// This is just for testing purposes, please remove when developing an actual app
         /// </summary>
         /// <returns></returns>
-        Task<bool> AddTestAsync(Test test);
+        bool AddTest(Test test);
 
 
         /// <summary>
@@ -48,7 +46,7 @@ namespace Template.Core.Interfaces
         /// </summary>
         /// <param name="id">Id of the test to get</param>
         /// <returns></returns>
-        Task<Test> GetTestAsync(int id);
+        Test GetTest(int id);
 
 
         /// <summary>
@@ -56,6 +54,6 @@ namespace Template.Core.Interfaces
         /// This is just for testing purposes, please remove when developing an actual app
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<Test>> GetTestsAsync();
+        IEnumerable<Test> GetTests();
     }
 }
