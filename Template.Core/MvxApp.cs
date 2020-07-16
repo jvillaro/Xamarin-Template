@@ -14,7 +14,7 @@ using Template.Core.ViewModels;
 
 namespace Template.Core
 {
-    public class App : MvxApplication
+    public class MvxApp : MvxApplication
     {
         /// <summary>
         /// Breaking change in v6: This method is called on a background thread. Use

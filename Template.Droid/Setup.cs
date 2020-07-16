@@ -9,7 +9,7 @@ using MvvmCross.Forms.Platforms.Android.Core;
 
 namespace Template.Droid
 {
-    public class Setup : MvxFormsAndroidSetup<Core.App, Core.UI.App>
+    public class Setup : MvxFormsAndroidSetup<Core.MvxApp, Core.App>
     {
     }
 }
