@@ -43,6 +43,8 @@ namespace Template.Core.Services
         {
             var fileStore = Mvx.IoCProvider.GetSingleton<IMvxFileStore>();
             database = CreateDatabase(fileStore.NativePath(string.Empty));
+
+            database.CreateTable<Test>(); // TODO: This is just for testing purposes, please remove when developing an actual app
         }
 
         #endregion
