@@ -10,6 +10,6 @@ namespace Template.Core.Constants
     /// </summary>
     public class DatabaseConstants
     {
-        public const string DatabaseName = "AppData.db";
+        public const string DatabaseName = "AppDatabase.db";
     }
 }

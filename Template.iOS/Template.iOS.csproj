@@ -66,12 +66,18 @@
     <AppExtensionDebugBundleId />
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="LinkerPleaseInclude.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="Services\PlatformService.cs" />
+    <BundleResource Include="..\Languages\Spanish\Texts.json">
+      <Link>Languages\Texts.json</Link>
+    </BundleResource>
+    <Compile Include="Setup.cs" />
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Entitlements.plist" />
-    <InterfaceDefinition Include="LaunchScreen.storyboard" />
+    <InterfaceDefinition Include="Resources\LaunchScreen.storyboard" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -92,6 +98,18 @@
       <Version>6.4.2</Version>
     </PackageReference>
     <PackageReference Include="MvvmCross.Forms">
+      <Version>6.4.2</Version>
+    </PackageReference>
+    <PackageReference Include="MvvmCross.Plugin.JsonLocalization">
+      <Version>6.4.2</Version>
+    </PackageReference>
+    <PackageReference Include="MvvmCross.Plugin.Messenger">
+      <Version>6.4.2</Version>
+    </PackageReference>
+    <PackageReference Include="MvvmCross.Plugin.ResourceLoader">
+      <Version>6.4.2</Version>
+    </PackageReference>
+    <PackageReference Include="MvvmCross.Plugin.Visibility">
       <Version>6.4.2</Version>
     </PackageReference>
     <PackageReference Include="sqlite-net-pcl">
@@ -146,9 +164,7 @@
       <Visible>false</Visible>
     </ImageAsset>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Template.Core\Template.Core.csproj">
       <Project>{4fd4f8c4-61cc-48a0-b0ce-70c9ef2c4682}</Project>

@@ -5,50 +5,48 @@
              xmlns:viewModels="clr-namespace:Template.Core.ViewModels;assembly=Template.Core"
              x:Class="Template.Core.Pages.MenuPage"
              x:TypeArguments="viewModels:MenuViewModel" 
-             x:Name="MainContent"
-             Icon="hamburger.png">
-    
-    <ContentPage.Content>
-        
-        <StackLayout>
-
-            <StackLayout HeightRequest="40">
-                
-                <StackLayout.IsVisible>
-                    <OnPlatform x:TypeArguments="x:Boolean">
-                        <On Platform="Android, iOS" Value="True" />
-                    </OnPlatform>
-                </StackLayout.IsVisible>
-                
-                <StackLayout.Margin>
-                    <OnPlatform x:TypeArguments="Thickness">
-                        <On Platform="iOS" Value="0,20,0,0" />
-                    </OnPlatform>
-                </StackLayout.Margin>
-                
-                <Label Text="Template" Margin="10" VerticalOptions="Center" FontSize="Large"></Label>
+             Title="Menu">
             
-            </StackLayout>
-            
-            <ListView 
-                ItemsSource="{Binding MenuItems}" 
-                SelectedItem="{Binding SelectedMenuItem, Mode=TwoWay}">
+    <StackLayout>
 
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <ViewCell>
-                            <StackLayout HeightRequest="50">
-                                <Label Text="{Binding Name}" Margin="20,0,0,0" 
-                                       VerticalOptions="CenterAndExpand"></Label>
-                            </StackLayout>
-                        </ViewCell>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
+        <StackLayout HeightRequest="40">
                 
-            </ListView>
+            <StackLayout.IsVisible>
+                <OnPlatform x:TypeArguments="x:Boolean">
+                    <On Platform="Android, iOS" Value="True" />
+                </OnPlatform>
+            </StackLayout.IsVisible>
+                
+            <StackLayout.Margin>
+                <OnPlatform x:TypeArguments="Thickness">
+                    <On Platform="iOS" Value="0,20,0,0" />
+                </OnPlatform>
+            </StackLayout.Margin>
+                
+            <Label Text="Template" Margin="10" VerticalOptions="Center" FontSize="Large"></Label>
             
         </StackLayout>
-        
-    </ContentPage.Content>
+
+        <ListView 
+            RowHeight="48"
+            ItemsSource="{Binding MenuItems}" 
+            SelectedItem="{Binding SelectedMenuItem, Mode=TwoWay}"
+            SeparatorVisibility="None"
+            ItemTapped="ItemTapped">
+
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <ViewCell>
+                        <StackLayout HeightRequest="50">
+                            <Label Text="{Binding Name}" Margin="20,0,0,0" 
+                                    VerticalOptions="CenterAndExpand"></Label>
+                        </StackLayout>
+                    </ViewCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+                
+        </ListView>
+            
+    </StackLayout>        
     
 </views:MvxContentPage>

@@ -1,6 +1,8 @@
 ﻿#region --- using ---
 
 using MvvmCross.Commands;
+using MvvmCross.Logging;
+using MvvmCross.Navigation;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Template.Core.Entities;
@@ -42,19 +44,28 @@ namespace Template.Core.ViewModels
 
 
         public MvxCommand AddTestCommand => addTest ?? (
-            addTest = new MvxCommand(async () =>
+            addTest = new MvxCommand( () =>
             {
-                await DataService.AddTestAsync(new Test { Text = string.Format("Test {0}", tests.Count+1) });
-                Tests = await GetTests();
+                DataService.AddTest(new Test { Text = string.Format("Test {0}", tests.Count+1) });
+                Tests = GetTests();
             }));
 
 
         public MvxCommand RemoveTestCommand => removeTest ?? (
-            removeTest = new MvxCommand(async () =>
+            removeTest = new MvxCommand(() =>
             {
-                await DataService.DeleteAsync<Test>(SelectedTest);
-                Tests = await GetTests();
+                DataService.Delete<Test>(SelectedTest);
+                Tests = GetTests();
             }));
+
+        #endregion
+
+
+        #region --- Constructor ---
+
+        public DataTestViewModel(IMvxLogProvider logProvider, IMvxNavigationService navigationService) : base(logProvider, navigationService)
+        {
+        }
 
         #endregion
 
@@ -69,9 +80,9 @@ namespace Template.Core.ViewModels
         {
             base.Initialize();
 
-            return Task.Run(async () =>
+            return Task.Run(() =>
             {
-                Tests = await GetTests();
+                Tests = GetTests();
             });
         }
 
@@ -84,9 +95,9 @@ namespace Template.Core.ViewModels
         /// Get the test from the database
         /// </summary>
         /// <returns></returns>
-        public async Task<ObservableCollection<Test>> GetTests() 
+        public ObservableCollection<Test> GetTests() 
         {
-            return new ObservableCollection<Test>(await DataService.GetTestsAsync());
+            return new ObservableCollection<Test>(DataService.GetTests());
         }
 
         #endregion

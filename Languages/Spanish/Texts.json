@@ -1,0 +1,13 @@
+{
+  "AppTitle": "Xamarin Template",
+  "Home": "Inicio",
+  "DataTests": "Pruebas de datos",
+  "Login": "Iniciar sesión",
+  "Logout": "Cerrar sesión",
+  "AddTest": "Agregar",
+  "RemoveTest": "Eliminar",
+  "Confirmation": "Confirmación",
+  "CloseSessionQuestion": "¿Desea cerrar sesión?",
+  "Yes": "Sí",
+  "No": "No"
+}

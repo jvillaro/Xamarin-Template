@@ -5,6 +5,8 @@
     x:Class="Template.Core.UI.Pages.HomePage"
     xmlns:views="clr-namespace:MvvmCross.Forms.Views;assembly=MvvmCross.Forms"
     xmlns:viewModels="clr-namespace:Template.Core.ViewModels;assembly=Template.Core"
+    xmlns:mvx="clr-namespace:MvvmCross.Forms.Bindings;assembly=MvvmCross.Forms"
+    mvx:La.ng="Title AppTitle, FallbackValue=AppTitle"
     x:TypeArguments="viewModels:HomeViewModel">
 
     <StackLayout Orientation="Vertical" VerticalOptions="FillAndExpand">
@@ -14,8 +16,8 @@
             TextColor="Black"
             HorizontalOptions="Center"
             VerticalOptions="Center" 
-            Text="Home"/>
-            
+            Text="{mvx:MvxLang Home}"/>
+
     </StackLayout>        
     
 </views:MvxContentPage>

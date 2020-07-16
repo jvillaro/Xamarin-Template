@@ -5,6 +5,9 @@ using Template.Core.Interfaces;
 
 namespace Template.Core.Services
 {
+    /// <summary>
+    /// Platform service
+    /// </summary>
     public class PlatformService : IPlatformService
     {
     }

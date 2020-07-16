@@ -3,7 +3,6 @@
 using Android.App;
 using Android.Content.PM;
 using Android.OS;
-using MvvmCross.Forms.Platforms.Android.Core;
 using MvvmCross.Forms.Platforms.Android.Views;
 using System.Threading.Tasks;
 
@@ -15,18 +14,21 @@ namespace Template.Droid.Activities
     /// Splash screen
     /// </summary>
     [Activity(
-        Label = "@string/app_name"
+        Label = "@string/AppName"
         , Icon = "@mipmap/ic_launcher"
-        , Theme = "@style/AppTheme.Splash"
+        , Theme = "@style/Theme.Splash"
         , MainLauncher = true
         , NoHistory = true
         , ScreenOrientation = ScreenOrientation.Portrait)]
     public class SplashScreenActivity : MvxFormsSplashScreenActivity<Setup, Core.MvxApp, Core.App>
     {
+        /// <summary>
+        /// Starts the main activity
+        /// </summary>  
         protected override Task RunAppStartAsync(Bundle bundle)
         {
             StartActivity(typeof(MainActivity));
-            return Task.CompletedTask;
+            return base.RunAppStartAsync(bundle);
         }
     }
 }

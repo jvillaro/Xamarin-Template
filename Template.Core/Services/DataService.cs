@@ -1,10 +1,16 @@
 ﻿#region --- using ---
 
 using Microsoft.AppCenter.Crashes;
+using MvvmCross;
+using MvvmCross.Plugin.File;
+using Newtonsoft.Json;
 using SQLite;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using Template.Core.Constants;
 using Template.Core.Entities;
@@ -22,18 +28,8 @@ namespace Template.Core.Services
     {
         #region --- Variables ---
 
-        private SQLiteAsyncConnection database;
-        
-        #endregion
-
-
-        #region --- Properties ---
-
-        /// <summary>
-        /// Database path
-        /// </summary>
-        public string DatabasePath => Path.Combine(FileSystem.AppDataDirectory, DatabaseConstants.DatabaseName);
-
+        private readonly SQLiteConnection database;
+        private static HttpClient httpClient;
 
         #endregion
 
@@ -45,84 +41,58 @@ namespace Template.Core.Services
         /// </summary>
         public DataService()
         {
-            CreateDatabase();
+            var fileStore = Mvx.IoCProvider.GetSingleton<IMvxFileStore>();
+            database = CreateDatabase(fileStore.NativePath(string.Empty));
+
+            database.CreateTable<Test>(); // TODO: This is just for testing purposes, please remove when developing an actual app
         }
 
         #endregion
 
 
+        #region --- Database methods ---
+        
         #region --- CreateDatabase ---
 
         /// <summary>
         /// Create the database and tables if they don´t exist
         /// </summary>
         /// <returns></returns>
-        public Task CreateDatabase()
-        {
-            return Task.Run(async () => 
-            {
-                try
-                {
-                    database = new SQLiteAsyncConnection(DatabasePath);
-
-                    await database.CreateTableAsync<Test>(); // TODO: This is just for testing purposes, please remove when developing an actual app
-                }
-                catch (Exception ex)
-                {
-                    Crashes.TrackError(ex, new Dictionary<string, string>
-                    {
-                        { "File", "DataService" },
-                        { "Method", "CreateDatabase" },
-                        { "Error message", ex.Message }
-                    });
-                }
-            });
-        }
-
-        #endregion
-
-
-        #region --- InsertAsync ---
-
-        /// <summary>
-        /// Insert an object in to the database
-        /// </summary>
-        /// <param name="item">Item to insert</param>
-        /// <returns></returns>
-        public async Task<int> InsertAsync(object item) 
+        public static SQLiteConnection CreateDatabase(string filePath)
         {
             try
             {
-                return await database.InsertAsync(item);
+                var databasePath = filePath + DatabaseConstants.DatabaseName;
+                var database = new SQLiteConnection(databasePath, SQLiteOpenFlags.Create | SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.FullMutex);
+                return database;
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex, new Dictionary<string, string>
                 {
                     { "File", "DataService" },
-                    { "Method", "InsertAsync" },
+                    { "Method", "CreateDatabase" },
                     { "Error message", ex.Message }
                 });
-
-                return 0;
+                return null;
             }
         }
 
         #endregion
 
 
-        #region --- InsertOrReplaceAsync ---
+        #region --- Insert ---
 
         /// <summary>
-        /// Insert or replace an object in to the database
+        /// Insert an object in to the database
         /// </summary>
         /// <param name="item">Item to insert</param>
         /// <returns></returns>
-        public async Task<int> InsertOrReplace(object item)
+        public int Insert(object item) 
         {
             try
             {
-                return await database.InsertOrReplaceAsync(item);
+                return database.Insert(item);
             }
             catch (Exception ex)
             {
@@ -140,7 +110,36 @@ namespace Template.Core.Services
         #endregion
 
 
-        #region --- InsertAllAsync ---
+        #region --- InsertOrReplace ---
+
+        /// <summary>
+        /// Insert or replace an object in to the database
+        /// </summary>
+        /// <param name="item">Item to insert</param>
+        /// <returns></returns>
+        public int InsertOrReplace(object item)
+        {
+            try
+            {
+                return database.InsertOrReplace(item);
+            }
+            catch (Exception ex)
+            {
+                Crashes.TrackError(ex, new Dictionary<string, string>
+                {
+                    { "File", "DataService" },
+                    { "Method", "InsertOrReplace" },
+                    { "Error message", ex.Message }
+                });
+
+                return 0;
+            }
+        }
+
+        #endregion
+
+
+        #region --- InsertAll ---
 
         /// <summary>
         /// Inserts many objects in to the database
@@ -148,18 +147,18 @@ namespace Template.Core.Services
         /// <param name="items">Items to insert in the database</param>
         /// <param name="runIntransaction">Run inserts wrapped in a transaction. Default is true</param>
         /// <returns></returns>
-        public async Task<int> InsertAllAsync(IEnumerable<object> items, bool runIntransaction = true)
+        public int InsertAll(IEnumerable<object> items, bool runIntransaction = true)
         {
             try
             {
-                return await database.InsertAllAsync(items, runIntransaction);
+                return database.InsertAll(items, runIntransaction);
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex, new Dictionary<string, string>
                 {
                     { "File", "DataService" },
-                    { "Method", "InsertAllAsync" },
+                    { "Method", "InsertAll" },
                     { "Error message", ex.Message }
                 });
 
@@ -170,7 +169,7 @@ namespace Template.Core.Services
         #endregion
 
 
-        #region --- UpdateAsync ---
+        #region --- Update ---
 
         /// <summary>
         /// Update an object in the database
@@ -178,18 +177,18 @@ namespace Template.Core.Services
         /// <typeparam name="T">Item type</typeparam>
         /// <param name="item">Item to insert</param>
         /// <returns></returns>
-        public async Task<int> UpdateAsync(object item)
+        public int Update(object item)
         {
             try
             {
-                return await database.UpdateAsync(item);
+                return database.Update(item);
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex, new Dictionary<string, string>
                 {
                     { "File", "DataService" },
-                    { "Method", "UpdateAsync" },
+                    { "Method", "Update" },
                     { "Error message", ex.Message }
                 });
 
@@ -200,7 +199,7 @@ namespace Template.Core.Services
         #endregion
 
 
-        #region --- UpdateAllAsync ---
+        #region --- UpdateAll ---
 
         /// <summary>
         /// Updates many objects in the database
@@ -208,18 +207,18 @@ namespace Template.Core.Services
         /// <param name="items">Items to update in the database</param>
         /// <param name="runIntransaction">Run updates wrapped in a transaction. Default is true</param>
         /// <returns></returns>
-        public async Task<int> UpdateAllAsync(IEnumerable<object> items, bool runIntransaction = true)
+        public int UpdateAll(IEnumerable<object> items, bool runIntransaction = true)
         {
             try
             {
-                return await database.UpdateAllAsync(items, runIntransaction);
+                return database.UpdateAll(items, runIntransaction);
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex, new Dictionary<string, string>
                 {
                     { "File", "DataService" },
-                    { "Method", "UpdateAllAsync" },
+                    { "Method", "UpdateAll" },
                     { "Error message", ex.Message }
                 });
 
@@ -230,7 +229,7 @@ namespace Template.Core.Services
         #endregion
 
 
-        #region --- DeleteAsync ---
+        #region --- Delete ---
 
         /// <summary>
         /// Delete an item in the database
@@ -238,18 +237,18 @@ namespace Template.Core.Services
         /// <typeparam name="T">Item type</typeparam>
         /// <param name="item">Item to insert</param>
         /// <returns></returns>
-        public async Task<int> DeleteAsync<T>(object item)
+        public int Delete<T>(object item)
         {
             try
             {
-                return await database.DeleteAsync(item);
+                return database.Delete(item);
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex, new Dictionary<string, string>
                 {
                     { "File", "DataService" },
-                    { "Method", "DeleteAsync" },
+                    { "Method", "Delete" },
                     { "Error message", ex.Message }
                 });
 
@@ -260,25 +259,25 @@ namespace Template.Core.Services
         #endregion
 
 
-        #region --- DeleteAllAsync ---
+        #region --- DeleteAll ---
 
         /// <summary>
         /// Deletes all rows in the specified table
         /// </summary>
         /// <typeparam name="T">Table to delete content</typeparam>
         /// <returns></returns>
-        public async Task<int> DeleteAllAsync<T>()
+        public int DeleteAll<T>()
         {
             try
             {
-                return await database.DeleteAllAsync<T>();
+                return database.DeleteAll<T>();
             }
             catch (Exception ex)
             {
                 Crashes.TrackError(ex, new Dictionary<string, string>
                 {
                     { "File", "DataService" },
-                    { "Method", "DeleteAllAsync" },
+                    { "Method", "DeleteAll" },
                     { "Error message", ex.Message }
                 });
 
@@ -288,22 +287,109 @@ namespace Template.Core.Services
 
         #endregion
 
+        #endregion
 
-        #region --- AddTestAsync ---
+
+        #region --- HTTP client methods ---
+
+        #region --- CreateHttpClient ---
 
         /// <summary>
-        /// This is just for testing purposes, please remove when developing an actual app
+        /// Creates and configures the HTTP client
         /// </summary>
-        /// <returns></returns>
-        public async Task<bool> AddTestAsync(Test test)
+        private void CreateHttpClient()
         {
-            return await InsertAsync(test) > 0 ? true : false;
+            // Disables the default cache
+            if (httpClient != null)
+            {
+                httpClient.DefaultRequestHeaders.IfModifiedSince = DateTimeOffset.Now;
+            }
+            httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.IfModifiedSince = DateTimeOffset.Now;
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.Timeout = new TimeSpan(0, 0, 5, 0);
         }
 
         #endregion
 
 
-        #region --- GetTestAsync ---
+        #region --- PostAsync ---
+
+        /// <summary>
+        /// Post data 
+        /// </summary>
+        protected async Task<T> PostAsync<T>(object postData, string uri, JsonSerializerSettings settings = null)
+        {
+            CreateHttpClient();
+            var data = JsonConvert.SerializeObject(postData);
+            var contentPost = new StringContent(data, Encoding.UTF8, "application/json");
+            var result = await httpClient.PostAsync(uri, contentPost);
+            if (result.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                throw new Exception($"Error in PostAsync: {result.StatusCode}");
+            }
+            var response = await result.Content.ReadAsStringAsync();
+            var resultData = JsonConvert.DeserializeObject<T>(response, settings);
+            return resultData;
+        }
+
+        #endregion
+
+
+        #region --- GetAsync ---
+
+        /// <summary>
+        /// Executes a GET method to the service
+        /// </summary>
+        protected async Task<T> GetAsync<T>(string uri, JsonSerializerSettings settings = null)
+        {
+
+            var result = await httpClient.GetAsync(uri);
+            if (result.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                throw new Exception($"Error in GetAsync: {result.StatusCode}");
+            }
+            var response = await result.Content.ReadAsStringAsync();
+            var data = JsonConvert.DeserializeObject<T>(response);
+            return data;
+        }
+
+        #endregion
+
+        #endregion
+
+
+        /*--- App methods ---*/
+
+        #region --- CreateTables ---
+
+        /// <summary>
+        /// Create the necessary tables
+        /// </summary>
+        public void CreateTables()
+        {
+            // TODO: This is just for testing purposes, please remove when developing an actual app
+            database.CreateTable<Test>(); 
+        }
+
+        #endregion
+
+
+        #region --- AddTest ---
+
+        /// <summary>
+        /// This is just for testing purposes, please remove when developing an actual app
+        /// </summary>
+        /// <returns></returns>
+        public bool AddTest(Test test)
+        {
+            return Insert(test) > 0 ? true : false;
+        }
+
+        #endregion
+
+
+        #region --- GetTest ---
 
         /// <summary>
         /// Get the specified test
@@ -311,24 +397,24 @@ namespace Template.Core.Services
         /// </summary>
         /// <param name="id">Id of the test to get</param>
         /// <returns></returns>
-        public async Task<Test> GetTestAsync(int id)
+        public Test GetTest(int id)
         {
-            return await database.GetAsync<Test>(id);
+            return database.Get<Test>(id);
         }
 
         #endregion
 
 
-        #region --- GetTestsAsync ---
+        #region --- GetTests ---
 
         /// <summary>
         /// Gets all the tests
         /// This is just for testing purposes, please remove when developing an actual app
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<Test>> GetTestsAsync()
+        public IEnumerable<Test> GetTests()
         {
-            return await database.Table<Test>().ToListAsync();
+            return database.Table<Test>().ToList();
         }
 
         #endregion
