@@ -20,7 +20,7 @@ namespace Template.Droid.Activities
         , MainLauncher = true
         , NoHistory = true
         , ScreenOrientation = ScreenOrientation.Portrait)]
-    public class SplashScreenActivity : MvxFormsSplashScreenActivity<Setup, Core.App, Core.UI.App>
+    public class SplashScreenActivity : MvxFormsSplashScreenActivity<Setup, Core.MvxApp, Core.App>
     {
         /// <summary>
         /// Starts the main activity

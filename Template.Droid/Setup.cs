@@ -21,7 +21,7 @@ namespace Template.Droid
     /// <summary>
     /// Android setup class
     /// </summary>
-    public class Setup : MvxFormsAndroidSetup<Core.App, Core.UI.App>
+    public class Setup : MvxFormsAndroidSetup<Core.MvxApp, Core.App>
     {
         /// <summary>
         /// Sets the log provider
